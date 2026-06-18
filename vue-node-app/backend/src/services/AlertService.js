@@ -1,31 +1,20 @@
 const db = require('../config/db');
 
-/**
- * Port dari PHP AlertService.php + NotificationService.php
- */
 class AlertService {
-  async createIfNeeded(conn, deviceId, readingId, riskLevel, respiratoryPatternDetected, message) {
-    const shouldCreate =
-      ['MEDIUM', 'HIGH'].includes(riskLevel) || respiratoryPatternDetected === 1;
+  async createIfNeeded(conn, deviceId, readingId, riskLevel, resp, message) {
+    if (riskLevel === 'LOW') return;
 
-    if (!shouldCreate) return null;
+    const title =
+      riskLevel === 'HIGH'
+        ? 'BAHAYA CO2'
+        : 'PERINGATAN CO2';
 
-    const level = ['MEDIUM', 'HIGH'].includes(riskLevel) ? riskLevel : 'MEDIUM';
-
-    const titleMap = {
-      HIGH: 'BAHAYA: Risiko malposisi NGT terdeteksi!',
-      MEDIUM: 'WASPADA: Verifikasi posisi selang NGT diperlukan',
-    };
-
-    const title = titleMap[level] || 'Alert CO2 NGT';
-
-    const [result] = await (conn || db).execute(
-      `INSERT INTO alerts (device_id, reading_id, title, message, level, is_read, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, 0, NOW(), NOW())`,
-      [deviceId, readingId, title, message, level]
+    await (conn || db).execute(
+      `INSERT INTO alerts 
+      (device_id, reading_id, title, message, level, is_read, created_at)
+      VALUES (?, ?, ?, ?, ?, 0, NOW())`,
+      [deviceId, readingId, title, message, riskLevel]
     );
-
-    return result.insertId;
   }
 }
 
