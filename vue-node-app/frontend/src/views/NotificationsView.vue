@@ -5,7 +5,7 @@
     <header class="section-head" style="margin-bottom: 24px;">
       <div>
         <h2>Notifikasi & Alert</h2>
-        <p style="color:var(--text-soft); font-size:14px; margin:4px 0 0;">Riwayat peringatan dan status NGT.</p>
+        <p style="color:var(--text-soft); font-size:13px; margin:4px 0 0;">Riwayat peringatan dan status NGT.</p>
       </div>
       <button 
         v-if="alertsStore.unreadCount > 0" 

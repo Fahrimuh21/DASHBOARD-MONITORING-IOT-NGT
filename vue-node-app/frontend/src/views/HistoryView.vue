@@ -5,7 +5,7 @@
     <header class="section-head" style="margin-bottom: 20px;">
       <div>
         <h2>Riwayat Pembacaan</h2>
-        <p style="color:var(--text-soft); font-size:14px; margin:4px 0 0;">Log data historis sensor CO2.</p>
+        <p style="color:var(--text-soft); font-size:13px; margin:4px 0 0;">Log data historis sensor CO2.</p>
       </div>
     </header>
 
@@ -38,37 +38,60 @@
       Tidak ada data riwayat yang ditemukan.
     </div>
 
-    <div v-else class="card wide-table" style="padding:0; overflow:hidden;">
-      <table>
-        <thead>
-          <tr>
-            <th>Waktu</th>
-            <th>Device</th>
-            <th>Pasien</th>
-            <th>CO2 (ppm)</th>
-            <th>Persentase</th>
-            <th>Tren</th>
-            <th>Status NGT</th>
-            <th>Risiko</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="r in readings" :key="r.id">
-            <td style="white-space:nowrap;">{{ formatTime(r.created_at) }}</td>
-            <td><strong>{{ r.device_name }}</strong></td>
-            <td>{{ r.patient_name || '-' }}</td>
-            <td style="font-family:monospace;">{{ r.co2_ppm ?? '-' }}</td>
-            <td style="font-family:monospace;">{{ r.co2_percent !== null ? Number(r.co2_percent).toFixed(2) + '%' : '-' }}</td>
-            <td>
-              <span class="pill" style="font-size:10px; padding:2px 8px;" :style="getTrendStyle(r.co2_trend)">
-                {{ r.co2_trend }}
-              </span>
-            </td>
-            <td>{{ r.ngt_status ? r.ngt_status.replace(/_/g, ' ') : '-' }}</td>
-            <td><span class="pill" :class="`risk-${(r.risk_level || 'low').toLowerCase()}`" style="font-size:10px; padding:2px 8px;">{{ r.risk_level }}</span></td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-else>
+      <div class="card wide-table history-table-wrap" style="padding:0; overflow:hidden;">
+        <table>
+          <thead>
+            <tr>
+              <th>Waktu</th>
+              <th>Device</th>
+              <th>Pasien</th>
+              <th>CO2 (ppm)</th>
+              <th>Persentase</th>
+              <th>Tren</th>
+              <th>Status NGT</th>
+              <th>Risiko</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="r in readings" :key="r.id">
+              <td style="white-space:nowrap;">{{ formatTime(r.created_at) }}</td>
+              <td><strong>{{ r.device_name }}</strong></td>
+              <td>{{ r.patient_name || '-' }}</td>
+              <td style="font-family:monospace;">{{ r.co2_ppm ?? '-' }}</td>
+              <td style="font-family:monospace;">{{ r.co2_percent !== null ? Number(r.co2_percent).toFixed(2) + '%' : '-' }}</td>
+              <td>
+                <span class="pill" style="font-size:10px; padding:3px 8px;" :style="getTrendStyle(r.co2_trend)">
+                  {{ trendLabel(r.co2_trend) }}
+                </span>
+              </td>
+              <td>{{ formatNgtStatus(r.ngt_status) }}</td>
+              <td><span class="pill" :class="`risk-${(r.risk_level || 'low').toLowerCase()}`" style="font-size:10px; padding:3px 8px;">{{ riskLabel(r.risk_level) }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="history-list">
+        <div class="history-card" v-for="r in readings" :key="r.id">
+          <div class="history-card-head">
+            <span class="history-card-time">{{ formatTime(r.created_at) }}</span>
+            <span class="pill" :class="`risk-${(r.risk_level || 'low').toLowerCase()}`" style="font-size:10px; padding:3px 8px;">{{ riskLabel(r.risk_level) }}</span>
+          </div>
+          <div class="history-card-main">
+            <div class="history-card-co2"><strong>{{ r.co2_ppm ?? '-' }}</strong><small>ppm</small></div>
+            <div class="history-card-percent">{{ r.co2_percent !== null ? Number(r.co2_percent).toFixed(2) + '%' : '-' }}</div>
+          </div>
+          <div class="history-card-meta">
+            <strong>{{ r.device_name }}</strong>
+            <span v-if="r.patient_name">&middot; {{ r.patient_name }}</span>
+          </div>
+          <div class="history-card-foot">
+            <span class="pill" style="font-size:10px; padding:3px 8px;" :style="getTrendStyle(r.co2_trend)">{{ trendLabel(r.co2_trend) }}</span>
+            <span class="history-card-status">{{ formatNgtStatus(r.ngt_status) }}</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <BottomNavbar />
@@ -147,6 +170,28 @@ const getTrendStyle = (trend) => {
   if (trend === 'NAIK') return 'background:#fef2f2; color:#b91c1c;'
   if (trend === 'TURUN') return 'background:#f0f9ff; color:#0369a1;'
   return 'background:#f1f5f9; color:#475569;'
+}
+
+const trendLabel = (trend) => {
+  if (trend === 'NAIK') return 'Naik'
+  if (trend === 'TURUN') return 'Turun'
+  if (trend === 'STABIL') return 'Stabil'
+  return trend || '-'
+}
+
+const riskLabel = (level) => {
+  if (level === 'HIGH') return 'Bahaya'
+  if (level === 'MEDIUM') return 'Waspada'
+  if (level === 'LOW') return 'Aman'
+  return '-'
+}
+
+const formatNgtStatus = (status) => {
+  if (!status) return 'Aman'
+  if (status === 'TERINDIKASI_NON_RESPIRATORIK') return 'Aman'
+  if (status === 'PERLU_VERIFIKASI') return 'Waspada'
+  if (status === 'RISIKO_MALPOSISI_RESPIRATORIK') return 'Bahaya'
+  return status.replace(/_/g, ' ')
 }
 
 onMounted(() => {

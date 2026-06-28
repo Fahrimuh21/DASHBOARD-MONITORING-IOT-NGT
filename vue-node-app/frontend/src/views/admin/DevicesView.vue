@@ -5,7 +5,7 @@
     <header class="section-head" style="margin-bottom: 24px;">
       <div>
         <h2>Manajemen Perangkat (Admin)</h2>
-        <p style="color:var(--text-soft); font-size:14px; margin:4px 0 0;">Kelola daftar token dan perangkat NGT untuk pasien.</p>
+        <p style="color:var(--text-soft); font-size:13px; margin:4px 0 0;">Kelola daftar token dan perangkat NGT untuk pasien.</p>
       </div>
       <router-link to="/admin/device/create" class="btn primary">Tambah Perangkat</router-link>
     </header>
@@ -35,13 +35,13 @@
             <td style="font-family:monospace;">{{ d.device_code }}</td>
             <td>
               <div style="display:flex; align-items:center; gap:6px;">
-                <code style="background:var(--primary-mint); padding:2px 6px; border-radius:4px; font-size:12px;">{{ d.device_token }}</code>
+                <code style="background:var(--primary-mint); padding:2px 6px; border-radius:4px; font-size:11px;">{{ d.device_token }}</code>
               </div>
             </td>
             <td>{{ d.location || '-' }}</td>
             <td>
               <div v-if="d.patient_name">
-                <strong style="font-size:13px; color:var(--primary-dark);">{{ d.patient_name }}</strong>
+                <strong style="font-size:12px; color:var(--primary-dark);">{{ d.patient_name }}</strong>
                 <button class="btn ghost sm" @click="disconnectPatient(d.id)" style="padding:2px 6px; font-size:10px; margin-left:6px; height:auto;">Lepas</button>
               </div>
               <span v-else style="color:var(--text-soft); font-style:italic;">Belum terhubung</span>

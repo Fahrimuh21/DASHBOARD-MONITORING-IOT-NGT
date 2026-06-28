@@ -3,7 +3,7 @@
     <div class="login-card">
       <div class="login-brand">
         <div class="brand-mark logo-mark">
-          <img :src="logoUrl" alt="Logo NGT-Safe CO2" />
+          <img :src="logoUrl" alt="Logo Naspiontech" />
         </div>
         <h2 class="app-name">Lupa Password</h2>
       </div>
@@ -12,11 +12,11 @@
         {{ step === 1 ? 'Masukkan email Anda untuk menerima kode OTP reset password.' : 'Masukkan kode OTP dan password baru Anda.' }}
       </p>
 
-      <div v-if="errorMsg" class="alert-box error" style="padding:10px; font-size:13px; margin:0 0 14px;">
+      <div v-if="errorMsg" class="alert-box error" style="padding:9px 11px; font-size:12px; margin:0 0 12px;">
         {{ errorMsg }}
       </div>
       
-      <div v-if="successMsg" class="alert-box success" style="padding:10px; font-size:13px; margin:0 0 14px;">
+      <div v-if="successMsg" class="alert-box success" style="padding:9px 11px; font-size:12px; margin:0 0 12px;">
         {{ successMsg }}
       </div>
 
@@ -36,7 +36,7 @@
       <form v-if="step === 2" @submit.prevent="handleResetPassword" class="form">
         <div v-if="devOtp" class="alert-box info" style="background:#f0f9ff; border:1px solid #bae6fd; font-family:monospace; margin-bottom:14px;">
           <small style="display:block; color:#0369a1; margin-bottom:4px;">[DEV MODE] OTP Reset Anda:</small>
-          <strong style="font-size:18px; color:#0284c7; letter-spacing:4px;">{{ devOtp }}</strong>
+          <strong style="font-size:16px; color:#0284c7; letter-spacing:4px;">{{ devOtp }}</strong>
         </div>
 
         <div>
@@ -44,7 +44,7 @@
             <input type="text" v-model="form.otp" required maxlength="6" style="letter-spacing:4px; text-align:center; font-family:monospace;" />
           </label>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <label class="field-label">Password Baru
             <input type="password" v-model="form.password" required minlength="6" />
           </label>
@@ -57,7 +57,7 @@
         </button>
       </form>
 
-      <div style="margin-top:20px; text-align:center; font-size:13px;">
+      <div style="margin-top:16px; text-align:center; font-size:12px;">
         <router-link to="/login" class="link-action">Kembali ke Login</router-link>
       </div>
     </div>

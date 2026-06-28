@@ -5,7 +5,7 @@
     <header class="section-head" style="margin-bottom: 24px;">
       <div>
         <h2>Edit Perangkat</h2>
-        <p style="color:var(--text-soft); font-size:14px; margin:4px 0 0;">Ubah informasi atau alokasi pasien untuk perangkat ini.</p>
+        <p style="color:var(--text-soft); font-size:13px; margin:4px 0 0;">Ubah informasi atau alokasi pasien untuk perangkat ini.</p>
       </div>
       <router-link to="/admin/devices" class="btn ghost sm">Kembali</router-link>
     </header>
@@ -13,8 +13,8 @@
     <div v-if="pageLoading" class="spinner"></div>
 
     <div v-else class="dashboard-grid-clean">
-      <div class="card" style="max-width: 600px;">
-        <div v-if="errorMsg" class="alert-box error" style="padding:10px; font-size:13px; margin:0 0 14px;">
+      <div class="card" style="max-width: 600px; margin: 0 auto; display:flex; flex-direction:column; gap:10px; padding:20px 18px; justify-content:center; align-items:stretch;">
+        <div v-if="errorMsg" class="alert-box error" style="padding:9px 11px; font-size:12px; margin:0 0 12px;">
           {{ errorMsg }}
         </div>
 
@@ -24,8 +24,8 @@
               <input type="text" v-model="form.device_name" required />
             </label>
           </div>
-          
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
             <label class="field-label">Kode Perangkat (HW ID)
               <input type="text" v-model="form.device_code" required style="font-family:monospace;" />
             </label>

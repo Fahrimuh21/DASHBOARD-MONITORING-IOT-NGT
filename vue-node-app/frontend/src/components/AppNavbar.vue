@@ -3,10 +3,10 @@
     <div class="app-navbar-inner" style="display: flex; align-items: center; justify-content: space-between;">
       <router-link to="/dashboard" class="navbar-brand">
         <span class="navbar-brand-mark logo-mark">
-          <img :src="logoUrl" alt="Logo NGT-Safe CO2" />
+          <img :src="logoUrl" alt="Logo Naspiontech" />
         </span>
         <span>
-          <span class="navbar-brand-title">NGT-Safe CO2</span>
+          <span class="navbar-brand-title">Naspiontech</span>
           <span class="navbar-brand-subtitle">{{ authStore.user?.role === 'PERAWAT' ? 'Perawat' : 'Realtime CO₂ Sensing' }}</span>
         </span>
       </router-link>
@@ -43,10 +43,10 @@
     <div style="display:flex; align-items:center; justify-content:space-between;">
       <div class="navbar-brand">
         <span class="navbar-brand-mark logo-mark">
-          <img :src="logoUrl" alt="Logo NGT-Safe CO2" />
+          <img :src="logoUrl" alt="Logo Naspiontech" />
         </span>
         <span>
-          <span class="navbar-brand-title">NGT-Safe CO2</span>
+          <span class="navbar-brand-title">Naspiontech</span>
           <span class="navbar-brand-subtitle">{{ authStore.user?.role === 'PERAWAT' ? 'Perawat' : 'Pasien' }}</span>
         </span>
       </div>

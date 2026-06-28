@@ -2,55 +2,69 @@
   <div class="app-shell">
     <AppNavbar />
 
-    <header class="section-head" style="margin-bottom: 24px;">
+    <header class="section-head form-page-head" style="margin-bottom: 24px;">
       <div>
         <h2>Hubungkan Perangkat NGT</h2>
-        <p style="color:var(--text-soft); font-size:14px; margin:4px 0 0;">Masukkan token perangkat yang diberikan oleh perawat.</p>
+        <p style="color:var(--text-soft); font-size:13px; margin:4px 0 0;">Masukkan token perangkat yang diberikan oleh perawat.</p>
       </div>
     </header>
 
     <div class="dashboard-grid-clean">
-      <div class="card" style="max-width: 500px;">
-        
-        <div v-if="errorMsg" class="alert-box error" style="padding:10px; font-size:13px; margin:0 0 14px;">
+      <div class="card connect-device-card">
+
+        <div class="connect-device-head">
+          <span class="connect-device-icon">
+            <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </span>
+          <div>
+            <h3>Hubungkan Perangkat Baru</h3>
+            <p>Masukkan token unik yang diberikan perawat untuk menyambungkan sensor NGT Anda.</p>
+          </div>
+        </div>
+
+        <div v-if="errorMsg" class="alert-box error" style="padding:9px 11px; font-size:12px; margin:0 0 12px;">
           {{ errorMsg }}
         </div>
-        <div v-if="successMsg" class="alert-box success" style="padding:10px; font-size:13px; margin:0 0 14px;">
+        <div v-if="successMsg" class="alert-box success" style="padding:9px 11px; font-size:12px; margin:0 0 12px;">
           {{ successMsg }}
         </div>
 
         <form @submit.prevent="handleConnect" class="form">
           <div>
             <label class="field-label">Token Perangkat
-              <input 
-                type="text" 
-                v-model="token" 
-                required 
+              <input
+                type="text"
+                v-model="token"
+                required
                 placeholder="Contoh: NGT-12345"
-                style="font-family:monospace; font-size:18px; letter-spacing:2px;" 
+                class="token-input"
               />
             </label>
-            <small style="color:var(--text-soft); font-size:12px; margin-top:6px; display:block;">
+            <small style="color:var(--text-soft); font-size:10px; margin-top:5px; display:block;">
               Minta token perangkat ke perawat yang bertugas.
             </small>
           </div>
 
-          <button type="submit" class="btn primary" :disabled="loading" style="margin-top:10px;">
+          <button type="submit" class="btn primary" :disabled="loading" style="margin-top:8px;">
             {{ loading ? 'Menghubungkan...' : 'Hubungkan Perangkat' }}
           </button>
         </form>
 
-        <hr style="border:0; border-top:1px solid var(--border); margin:24px 0;" />
+        <div class="connect-divider"><span>Perangkat Terhubung Saat Ini</span></div>
 
-        <h3 style="margin:0 0 10px; font-size:14px;">Perangkat Terhubung Saat Ini</h3>
-        <div v-if="loadingMyDevice" class="spinner"></div>
-        <div v-else-if="!myDevice" class="empty" style="padding:20px 10px;">
+        <div v-if="loadingMyDevice" class="spinner sm"></div>
+        <div v-else-if="!myDevice" class="empty sm">
           Belum ada perangkat terhubung.
         </div>
-        <div v-else class="card-row" style="background:var(--primary-mint); padding:14px; border-radius:12px; border:1px solid rgba(16,185,129,.25);">
-          <div>
-            <strong>{{ myDevice.device_name }}</strong>
-            <small style="display:block; color:var(--primary-dark);">{{ myDevice.device_code }}</small>
+        <div v-else class="connected-device-row">
+          <div class="connected-device-info">
+            <span class="connected-device-icon">
+              <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+            </span>
+            <div class="connected-device-meta">
+              <strong>{{ myDevice.device_name }}</strong>
+              <small>{{ myDevice.device_code }}</small>
+            </div>
           </div>
           <button class="btn warn sm" @click="handleDisconnect(myDevice.id)" :disabled="loading">Lepas</button>
         </div>
