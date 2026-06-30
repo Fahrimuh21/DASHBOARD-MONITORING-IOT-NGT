@@ -1,7 +1,6 @@
 const mqtt = require('mqtt');
 const db = require('./config/db');
-const RiskService = require('./services/NgtStatusService');
-const AlertService = require('./services/AlertService');
+const ReadingIngestService = require('./services/ReadingIngestService');
 
 // ================= CONFIG =================
 const BROKER = process.env.MQTT_BROKER || 'mqtt://broker.hivemq.com';
@@ -62,30 +61,10 @@ client.on('message', async (topic, message) => {
 
     const device_id = device[0].id;
 
-    // ================= RISK ENGINE =================
-    const risk = RiskService.evaluate(co2_ppm);
+    // ================= INGEST (live update + hourly/danger persistence + alert) =================
+    const result = await ReadingIngestService.ingest(device_id, co2_ppm, null);
 
-    // ================= INSERT READINGS =================
-    const [result] = await db.execute(
-      `INSERT INTO readings
-       (device_id, co2_ppm, risk_level, created_at)
-       VALUES (?, ?, ?, NOW())`,
-      [device_id, co2_ppm, risk.risk_level]
-    );
-
-    const reading_id = result.insertId;
-
-    // ================= ALERT SYSTEM =================
-    await AlertService.createIfNeeded(
-      null,
-      device_id,
-      reading_id,
-      risk.risk_level,
-      0,
-      risk.message
-    );
-
-    console.log('✅ SAVED TO DB:', co2_ppm);
+    console.log('✅ LIVE UPDATE:', co2_ppm, 'risk:', result.status.risk_level, result.readingId ? `(saved as reading #${result.readingId})` : '(live only)');
     console.log('====================================');
 
   } catch (err) {

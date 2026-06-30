@@ -110,7 +110,7 @@
 
           <StatCard
             title="Notifikasi Hari Ini"
-            :value="alertsStore.unreadCount"
+            :value="alertsStore.todayCount"
             unit="baru"
             type="alert"
           >
@@ -222,6 +222,7 @@ onMounted(() => {
   dashboardStore.startPolling(5000)
   alertsStore.fetchAlerts()
   alertsStore.fetchUnreadCount()
+  alertsStore.fetchTodayCount()
 })
 
 onUnmounted(() => {

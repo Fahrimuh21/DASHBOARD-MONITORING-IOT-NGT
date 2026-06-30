@@ -17,12 +17,11 @@
           </div>
           <div>
             <h2 class="app-name">Naspiontech</h2>
-            <span style="font-size:10px; color:var(--text-soft); font-weight:600;">Secure Portal</span>
           </div>
         </div>
 
         <h1>Masuk ke Akun</h1>
-        <p class="login-subtitle">Silakan login untuk mengakses dashboard.</p>
+        <p class="login-subtitle">Silakan login untuk mengakses dashboard Naspiontech.</p>
 
         <form @submit.prevent="handleLogin" class="form">
           <div class="role-switch">
@@ -66,12 +65,6 @@
           <router-link to="/register" class="link-action">Buat Akun Baru</router-link>
           <router-link to="/forgot-password" style="color:var(--text-soft);">Lupa Password?</router-link>
         </div>
-
-        <p class="small-note">
-          Akun demo:<br>
-          pasien@iot.local / pasien123<br>
-          perawat@iot.local / perawat123
-        </p>
       </div>
     </div>
   </div>

@@ -162,7 +162,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   gap: 12px;
   min-width: 210px;
   color: var(--text);
-  font-weight: 900;
+  font-weight: 700;
 }
 .navbar-brand:hover { color: var(--text); }
 .logo-mark,
@@ -184,8 +184,8 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 .brand-mark img { width: 100%; height: 100%; object-fit: cover; }
 .navbar-brand-title,
 .navbar-brand-subtitle { display: block; line-height: 1.12; }
-.navbar-brand-title { font-size: 14px; font-weight: 800; letter-spacing: -0.01em; }
-.navbar-brand-subtitle { margin-top: 2px; font-size: 10px; font-weight: 700; color: var(--text-soft); }
+.navbar-brand-title { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+.navbar-brand-subtitle { margin-top: 2px; font-size: 10px; font-weight: 500; color: var(--text-soft); }
 
 .navbar-links { align-items: center; }
 .navbar-link-item { display: inline-flex; }
@@ -199,7 +199,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   border-radius: 999px;
   color: #43526a;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 500;
   line-height: 1;
   transition: all .22s var(--ease);
 }
@@ -330,7 +330,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   color: #0f766e;
   font-size: clamp(13px, 1vw, 15px);
   line-height: 1.6;
-  font-weight: 600;
+  font-weight: 400;
 }
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 10px; }
 .btn-primary,
@@ -342,7 +342,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   padding: 0 20px;
   border-radius: 999px;
   font-size: 13px;
-  font-weight: 900;
+  font-weight: 600;
   cursor: pointer;
   transition: all .22s var(--ease);
 }
@@ -457,12 +457,12 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   font-weight: 800;
   letter-spacing: -0.02em;
 }
-.metric-card span { color: var(--text-soft); font-size: 11px; font-weight: 800; }
+.metric-card span { color: var(--text-soft); font-size: 11px; font-weight: 500; }
 .metric-card small,
 .metric-card .field-label {
   color: var(--text-soft);
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: .07em;
   text-transform: uppercase;
 }
@@ -486,7 +486,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   border: 1px solid var(--btn-bd);
   box-shadow: var(--shadow-xs);
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 500;
   cursor: pointer;
   transition: all .22s var(--ease);
 }
@@ -513,7 +513,7 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
   gap: 6px;
   color: var(--text-soft);
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: .06em;
   text-transform: uppercase;
 }
@@ -560,7 +560,7 @@ select {
   border-radius: 999px;
   border: 1px solid transparent;
   white-space: nowrap;
-  font-weight: 900;
+  font-weight: 600;
 }
 .badge { padding: 5px 10px; color: var(--primary-dark); background: var(--primary-mint); border-color: rgba(16,185,129,.24); font-size: 10px; }
 .pill { padding: 4px 10px; font-size: 10px; }
@@ -1072,8 +1072,8 @@ select {
   background: rgba(255,255,255,.12);
 }
 .login-hero-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.login-hero-panel h2 { position: relative; margin: 0; font-size: clamp(17px, 1.8vw, 21px); font-weight: 800; letter-spacing: -.01em; }
-.login-hero-panel p { position: relative; margin: 0; font-size: 11px; font-weight: 600; opacity: .92; }
+.login-hero-panel h2 { position: relative; margin: 0; font-size: clamp(17px, 1.8vw, 21px); font-weight: 700; letter-spacing: -.01em; }
+.login-hero-panel p { position: relative; margin: 0; font-size: 11px; font-weight: 400; opacity: .92; }
 .login-hero-btn {
   position: relative;
   align-self: flex-start;
@@ -1084,23 +1084,23 @@ select {
   color: #fff;
   background: transparent;
   font-size: 11px;
-  font-weight: 800;
+  font-weight: 600;
   transition: all .2s var(--ease);
 }
 .login-hero-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
 .login-hero-mascot {
   position: relative;
-  width: 75px;
+  width: 130px;
   align-self: center;
-  margin: 6px auto -18px;
+  margin: 10px auto -24px;
   filter: drop-shadow(0 14px 26px rgba(0,0,0,.18));
 }
 .login-form-panel { flex: 1 1 auto; min-width: 0; padding: 18px 20px; }
 
 .login-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
-.app-name { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: -.01em; color: var(--text); }
-.login-subtitle { margin: 0 0 12px; color: var(--text-soft); font-size: 13px; line-height: 1.5; }
-.login-form-panel h1 { margin: 0 0 2px; font-size: clamp(16px, 1.7vw, 19px); font-weight: 800; letter-spacing: -.01em; color: var(--text); }
+.app-name { margin: 0; font-size: 21px; font-weight: 700; letter-spacing: -.01em; color: var(--text); }
+.login-subtitle { margin: 0 0 12px; color: var(--text-soft); font-size: 13px; font-weight: 400; line-height: 1.5; }
+.login-form-panel h1 { margin: 0 0 2px; font-size: clamp(16px, 1.7vw, 19px); font-weight: 700; letter-spacing: -.01em; color: var(--text); }
 
 /* Compact overrides shared by all auth pages (login/register split + the single-card auth flows) */
 .login-form-panel .login-brand,
@@ -1146,7 +1146,7 @@ select {
   background: rgba(255,255,255,.70);
   color: var(--text-soft);
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 500;
   cursor: pointer;
   transition: all .2s var(--ease);
 }
@@ -1157,7 +1157,7 @@ select {
   box-shadow: 0 10px 24px rgba(16,185,129,.12);
 }
 .role-icon { font-size: 15px; }
-.link-action { color: var(--primary-dark); font-weight: 900; font-size: 12px; }
+.link-action { color: var(--primary-dark); font-weight: 600; font-size: 12px; }
 .link-action:hover { text-decoration: underline; }
 .small-note,
 .small,
@@ -1261,7 +1261,7 @@ small { font-size: 11px; }
   .login-hero-text { gap: 3px; }
   .login-hero-panel h2 { font-size: 16px; }
   .login-hero-mascot {
-    width: 88px;
+    width: 96px;
     flex: 0 0 auto;
     align-self: center;
     margin: 0;

@@ -5,8 +5,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     isInitialized: false,
-    pendingVerificationEmail: null,
-    otpDevDisplay: null
+    pendingVerificationEmail: null
   }),
   getters: {
     isAuthenticated: (state) => !!state.user,
@@ -39,7 +38,6 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         if (error.response?.status === 403 && error.response?.data?.data?.need_verification) {
           this.pendingVerificationEmail = error.response.data.data.email
-          this.otpDevDisplay = error.response.data.data.otp_dev
           return { success: false, needVerification: true, message: error.response.data.message }
         }
         return { success: false, message: error.response?.data?.message || 'Login gagal.' }
@@ -50,7 +48,6 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await api.post('/auth/register', payload)
         if (data.success) {
           this.pendingVerificationEmail = data.data.email
-          this.otpDevDisplay = data.data.otp_dev
           return { success: true }
         }
         return { success: false, message: data.message }
@@ -63,7 +60,6 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await api.post('/auth/verify-email', { email, otp })
         if (data.success) {
           this.pendingVerificationEmail = null
-          this.otpDevDisplay = null
           return { success: true, message: data.message }
         }
         return { success: false, message: data.message }

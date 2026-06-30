@@ -34,11 +34,6 @@
 
       <!-- Step 2: Reset Password -->
       <form v-if="step === 2" @submit.prevent="handleResetPassword" class="form">
-        <div v-if="devOtp" class="alert-box info" style="background:#f0f9ff; border:1px solid #bae6fd; font-family:monospace; margin-bottom:14px;">
-          <small style="display:block; color:#0369a1; margin-bottom:4px;">[DEV MODE] OTP Reset Anda:</small>
-          <strong style="font-size:16px; color:#0284c7; letter-spacing:4px;">{{ devOtp }}</strong>
-        </div>
-
         <div>
           <label class="field-label">Kode OTP
             <input type="text" v-model="form.otp" required maxlength="6" style="letter-spacing:4px; text-align:center; font-family:monospace;" />
@@ -74,7 +69,6 @@ const router = useRouter()
 
 const step = ref(1)
 const email = ref('')
-const devOtp = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
 const successMsg = ref('')
@@ -94,9 +88,6 @@ const handleRequestOtp = async () => {
     if (data.success) {
       step.value = 2
       successMsg.value = data.message
-      if (data.data?.otp_dev) {
-        devOtp.value = data.data.otp_dev
-      }
     } else {
       errorMsg.value = data.message
     }

@@ -27,6 +27,14 @@ CREATE TABLE IF NOT EXISTS devices (
   location VARCHAR(150) NULL,
   status ENUM('active', 'inactive') NOT NULL DEFAULT 'active',
   last_seen_at DATETIME NULL,
+  live_co2_ppm DECIMAL(10,2) NULL,
+  live_co2_percent DECIMAL(8,4) NULL,
+  live_previous_co2_ppm DECIMAL(10,2) NULL,
+  live_delta_co2_ppm DECIMAL(10,2) NULL,
+  live_co2_trend VARCHAR(30) NULL,
+  live_ngt_status VARCHAR(80) NULL,
+  live_risk_level VARCHAR(20) NULL,
+  live_message TEXT NULL,
   created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_devices_user_id (user_id),
@@ -81,16 +89,3 @@ CREATE TABLE IF NOT EXISTS contact_persons (
   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_contact_persons_name (name)
 ) ENGINE=InnoDB;
-
-INSERT INTO users (name, email, password, role, phone, alamat, email_verified_at, created_at, updated_at)
-VALUES
-  ('Pasien Demo', 'pasien@iot.local', '$2a$10$zKcSXMhljtmfFUE/oUel0.ghMWLTEtmeRlo87zeuLKbNSSWYbSXcG', 'PASIEN', '085261234567', 'Jl. Kesehatan No. 10', NOW(), NOW(), NOW()),
-  ('Perawat Demo', 'perawat@iot.local', '$2a$10$iG7WIworlnHdYfxkArOw4engmNStjO46ItoCcu6n8aiz744Pf1ST6', 'PERAWAT', '085277654321', 'Rumah Sakit Pusat', NOW(), NOW(), NOW())
-ON DUPLICATE KEY UPDATE
-  name = VALUES(name),
-  password = VALUES(password),
-  role = VALUES(role),
-  phone = VALUES(phone),
-  alamat = VALUES(alamat),
-  email_verified_at = VALUES(email_verified_at),
-  updated_at = NOW();

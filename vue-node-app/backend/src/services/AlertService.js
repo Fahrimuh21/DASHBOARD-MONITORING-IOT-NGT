@@ -3,11 +3,8 @@ const db = require('../config/db');
 class AlertService {
   async createIfNeeded(conn, deviceId, readingId, riskLevel, resp, message) {
     if (riskLevel === 'LOW') return;
-
-    const title =
-      riskLevel === 'HIGH'
-        ? 'BAHAYA CO2'
-        : 'PERINGATAN CO2';
+    
+    const title = 'Terdeteksi CO2'
 
     await (conn || db).execute(
       `INSERT INTO alerts 

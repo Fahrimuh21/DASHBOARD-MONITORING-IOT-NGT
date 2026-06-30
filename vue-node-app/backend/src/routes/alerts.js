@@ -49,6 +49,25 @@ router.get('/unread-count', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/alerts/today-count — jumlah notifikasi yang dibuat hari ini
+router.get('/today-count', requireAuth, async (req, res) => {
+  try {
+    const { where: devWhere, params: devParams } = deviceAccessClause(req, 'd');
+    const whereSql = devWhere
+      ? `WHERE DATE(a.created_at) = CURDATE() AND ${devWhere}`
+      : 'WHERE DATE(a.created_at) = CURDATE()';
+
+    const [rows] = await db.execute(
+      `SELECT COUNT(*) AS cnt FROM alerts a JOIN devices d ON d.id = a.device_id ${whereSql}`,
+      devParams
+    );
+    return jsonResponse(res, true, 'Jumlah notifikasi hari ini berhasil diambil.', { count: rows[0].cnt });
+  } catch (err) {
+    console.error(err);
+    return jsonResponse(res, false, 'Gagal mengambil jumlah notifikasi hari ini.', null, 500);
+  }
+});
+
 // PUT /api/alerts/:id/read — tandai sudah dibaca
 router.put('/:id/read', requireAuth, async (req, res) => {
   try {

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 const { jsonResponse } = require('../helpers');
+const mailer = require('../services/Mailer');
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -39,19 +40,23 @@ router.post('/login', async (req, res) => {
         .slice(0, 19)
         .replace('T', ' ');
 
+      try {
+        await mailer.sendOtp(user.email, otp, 'verify');
+      } catch (mailErr) {
+        console.error('Gagal mengirim email OTP:', mailErr.message);
+        return jsonResponse(res, false, 'Gagal mengirim kode OTP ke email. Periksa konfigurasi email server.', null, 502);
+      }
+
       await db.execute(
         'UPDATE users SET otp_code = ?, otp_expires_at = ?, updated_at = NOW() WHERE id = ?',
         [otp, otpExpires, user.id]
       );
 
-      // Simpan ke session untuk verify
       req.session.pending_verify_email = user.email;
-      req.session.otp_dev_display = otp; // Dev mode: tampilkan OTP
 
-      return jsonResponse(res, false, 'Email belum diverifikasi.', {
+      return jsonResponse(res, false, 'Email belum diverifikasi. Kode OTP telah dikirim ke email Anda.', {
         need_verification: true,
         email: user.email,
-        otp_dev: otp, // hanya untuk development
       }, 403);
     }
 
@@ -98,9 +103,32 @@ router.post('/register', async (req, res) => {
       ? role.toUpperCase()
       : 'PASIEN';
 
-    const [existing] = await db.execute('SELECT id FROM users WHERE email = ? LIMIT 1', [email]);
+    const [existing] = await db.execute(
+      'SELECT id, email_verified_at FROM users WHERE email = ? LIMIT 1',
+      [email]
+    );
     if (existing.length > 0) {
-      return jsonResponse(res, false, 'Email sudah terdaftar. Silakan login.', null, 409);
+      if (existing[0].email_verified_at) {
+        return jsonResponse(res, false, 'Email sudah terdaftar. Silakan login.', null, 409);
+      }
+      // Email ada tapi belum diverifikasi — kirim ulang OTP
+      const otp = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+      const otpExpires = new Date(Date.now() + 15 * 60 * 1000)
+        .toISOString()
+        .slice(0, 19)
+        .replace('T', ' ');
+      try {
+        await mailer.sendOtp(email, otp, 'verify');
+      } catch (mailErr) {
+        console.error('Gagal mengirim email OTP:', mailErr.message);
+        return jsonResponse(res, false, 'Gagal mengirim kode OTP ke email. Periksa konfigurasi email server.', null, 502);
+      }
+      await db.execute(
+        'UPDATE users SET otp_code = ?, otp_expires_at = ?, updated_at = NOW() WHERE id = ?',
+        [otp, otpExpires, existing[0].id]
+      );
+      req.session.pending_verify_email = email;
+      return jsonResponse(res, true, 'Email sudah terdaftar namun belum diverifikasi. Kode OTP baru telah dikirim.', { email }, 200);
     }
 
     const otp = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
@@ -108,6 +136,15 @@ router.post('/register', async (req, res) => {
       .toISOString()
       .slice(0, 19)
       .replace('T', ' ');
+
+    // Kirim email dulu — jangan buat akun jika OTP gagal terkirim.
+    try {
+      await mailer.sendOtp(email, otp, 'verify');
+    } catch (mailErr) {
+      console.error('Gagal mengirim email OTP:', mailErr.message);
+      return jsonResponse(res, false, 'Gagal mengirim kode OTP ke email. Periksa konfigurasi email server.', null, 502);
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await db.execute(
@@ -117,11 +154,9 @@ router.post('/register', async (req, res) => {
     );
 
     req.session.pending_verify_email = email;
-    req.session.otp_dev_display = otp;
 
-    return jsonResponse(res, true, 'Registrasi berhasil. Silakan verifikasi email.', {
+    return jsonResponse(res, true, 'Registrasi berhasil. Kode OTP telah dikirim ke email Anda.', {
       email,
-      otp_dev: otp, // dev mode
     }, 201);
   } catch (err) {
     console.error(err);
@@ -184,13 +219,19 @@ router.post('/forgot-password', async (req, res) => {
       .slice(0, 19)
       .replace('T', ' ');
 
+    try {
+      await mailer.sendOtp(email, otp, 'reset');
+    } catch (mailErr) {
+      console.error('Gagal mengirim email OTP:', mailErr.message);
+      return jsonResponse(res, false, 'Gagal mengirim kode OTP ke email. Periksa konfigurasi email server.', null, 502);
+    }
+
     await db.execute(
       'UPDATE users SET otp_code = ?, otp_expires_at = ?, updated_at = NOW() WHERE id = ?',
       [otp, otpExpires, rows[0].id]
     );
 
-    return jsonResponse(res, true, 'OTP reset password telah dikirim.', {
-      otp_dev: otp, // dev mode
+    return jsonResponse(res, true, 'OTP reset password telah dikirim ke email Anda.', {
       email,
     });
   } catch (err) {

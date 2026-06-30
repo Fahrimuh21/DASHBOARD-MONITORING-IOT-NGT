@@ -2,13 +2,10 @@ const router = require('express').Router();
 const db = require('../config/db');
 const { requireAuth } = require('../middleware/auth');
 const { deviceAccessClause, onlineStatus, formatDatetime, isNurse, jsonResponse } = require('../helpers');
-const ngtStatusService = require('../services/NgtStatusService');
-const trendService = require('../services/TrendService');
-const alertService = require('../services/AlertService');
+const readingIngestService = require('../services/ReadingIngestService');
 
 // POST /api/sensor/reading  — endpoint untuk ESP32
 router.post('/sensor/reading', async (req, res) => {
-  let conn;
   try {
     const token = req.headers['x-device-token'] || '';
     const { device_code, co2_ppm, co2_percent } = req.body || {};
@@ -48,58 +45,19 @@ router.post('/sensor/reading', async (req, res) => {
       return jsonResponse(res, false, 'Device tidak valid atau token salah.', null, 401);
     }
 
-    const [prevRows] = await db.execute(
-      'SELECT co2_ppm FROM readings WHERE device_id = ? ORDER BY created_at DESC, id DESC LIMIT 1',
-      [device.id]
-    );
-    const previousPpm = prevRows[0] ? parseFloat(prevRows[0].co2_ppm) : null;
-
-    const status = ngtStatusService.evaluate(ppm);
-    const trend = trendService.calculate(ppm, previousPpm);
-    const respiratoryPattern = status.risk_level === 'HIGH' ? 1 : 0;
-
-    conn = await db.getConnection();
-    await conn.beginTransaction();
-
-    const [insertResult] = await conn.execute(
-      `INSERT INTO readings (device_id, co2_ppm, co2_percent, previous_co2_ppm, delta_co2_ppm, co2_trend,
-        respiratory_pattern_detected, ngt_status, risk_level, message, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [
-        device.id, ppm, pct,
-        trend.previous_co2_ppm, trend.delta_co2_ppm, trend.co2_trend,
-        respiratoryPattern, status.ngt_status, status.risk_level, status.message,
-      ]
-    );
-
-    const readingId = insertResult.insertId;
-
-    await conn.execute(
-      'UPDATE devices SET last_seen_at = NOW(), updated_at = NOW() WHERE id = ?',
-      [device.id]
-    );
-
-    await alertService.createIfNeeded(
-      conn, device.id, readingId,
-      status.risk_level, respiratoryPattern, status.message
-    );
-
-    await conn.commit();
+    const result = await readingIngestService.ingest(device.id, ppm, pct);
 
     return jsonResponse(res, true, 'Data pembacaan CO2 berhasil disimpan.', {
       device_code,
       co2_ppm: ppm,
       co2_percent: pct,
-      ngt_status: status.ngt_status,
-      risk_level: status.risk_level,
-      co2_trend: trend.co2_trend,
+      ngt_status: result.status.ngt_status,
+      risk_level: result.status.risk_level,
+      co2_trend: result.trend.co2_trend,
     }, 201);
   } catch (err) {
-    if (conn) await conn.rollback().catch(() => {});
     console.error(err);
     return jsonResponse(res, false, 'Terjadi kesalahan server saat menyimpan data pembacaan CO2.', null, 500);
-  } finally {
-    if (conn) conn.release();
   }
 });
 
@@ -153,13 +111,13 @@ router.get('/latest', requireAuth, async (req, res) => {
     const [devices] = await db.execute(
       `SELECT d.id AS device_id, d.device_name, d.device_code, d.location, d.status, d.last_seen_at,
               u.name AS patient_name,
-              r.id AS reading_id, r.co2_ppm, r.co2_percent, r.previous_co2_ppm, r.delta_co2_ppm,
-              r.co2_trend, r.ngt_status, r.risk_level, r.message, r.created_at AS reading_at
+              d.live_co2_ppm AS co2_ppm, d.live_co2_percent AS co2_percent,
+              d.live_previous_co2_ppm AS previous_co2_ppm, d.live_delta_co2_ppm AS delta_co2_ppm,
+              d.live_co2_trend AS co2_trend, d.live_ngt_status AS ngt_status,
+              d.live_risk_level AS risk_level, d.live_message AS message,
+              d.last_seen_at AS reading_at
        FROM devices d
        LEFT JOIN users u ON u.id = d.user_id
-       LEFT JOIN readings r ON r.id = (
-         SELECT id FROM readings WHERE device_id = d.id ORDER BY created_at DESC, id DESC LIMIT 1
-       )
        ${whereSql}
        ORDER BY d.updated_at DESC, d.id DESC
        LIMIT 50`,

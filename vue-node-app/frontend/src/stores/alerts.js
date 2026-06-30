@@ -5,6 +5,7 @@ export const useAlertsStore = defineStore('alerts', {
   state: () => ({
     alerts: [],
     unreadCount: 0,
+    todayCount: 0,
     loading: false
   }),
   actions: {
@@ -26,6 +27,16 @@ export const useAlertsStore = defineStore('alerts', {
         const { data } = await api.get('/alerts/unread-count')
         if (data.success) {
           this.unreadCount = data.data.count
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    async fetchTodayCount() {
+      try {
+        const { data } = await api.get('/alerts/today-count')
+        if (data.success) {
+          this.todayCount = data.data.count
         }
       } catch (error) {
         console.error(error)

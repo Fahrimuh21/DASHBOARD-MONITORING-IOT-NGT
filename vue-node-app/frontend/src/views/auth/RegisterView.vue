@@ -21,7 +21,7 @@
         </div>
 
         <h1>Buat Akun</h1>
-        <p class="login-subtitle">Daftarkan akun baru untuk menggunakan sistem.</p>
+        <p class="login-subtitle">Daftarkan akun baru untuk mengakses Naspiontech.</p>
 
         <form @submit.prevent="handleRegister" class="form">
           <div class="role-switch">
