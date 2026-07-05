@@ -3,18 +3,27 @@ import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior(to) {
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth', top: 80 }
+    }
+    return { top: 0, behavior: 'smooth' }
+  },
   routes: [
+    {
+      path: '/',
+      name: 'landing',
+      component: () => import('../views/LandingView.vue'),
+    },
     {
       path: '/login',
       name: 'login',
       component: () => import('../views/auth/LoginView.vue'),
-      meta: { guestOnly: true }
     },
     {
       path: '/register',
       name: 'register',
       component: () => import('../views/auth/RegisterView.vue'),
-      meta: { guestOnly: true }
     },
     {
       path: '/verify-email',
@@ -27,10 +36,6 @@ const router = createRouter({
       name: 'forgotPassword',
       component: () => import('../views/auth/ForgotPasswordView.vue'),
       meta: { guestOnly: true }
-    },
-    {
-      path: '/',
-      redirect: '/dashboard'
     },
     {
       path: '/dashboard',

@@ -18,7 +18,8 @@
     <div v-else class="contact-grid">
       <div v-for="contact in contacts" :key="contact.id" class="card contact-card-modern">
         <div class="contact-card-banner">
-          <div class="contact-avatar contact-card-avatar">{{ contact.name?.charAt(0).toUpperCase() || 'P' }}</div>
+          <img v-if="contact.profile_photo" class="contact-avatar contact-card-avatar profile-photo" :src="contact.profile_photo" :alt="`Foto profil ${contact.name}`" />
+          <div v-else class="contact-avatar contact-card-avatar">{{ contact.name?.charAt(0).toUpperCase() || 'P' }}</div>
         </div>
 
         <div class="contact-card-body">

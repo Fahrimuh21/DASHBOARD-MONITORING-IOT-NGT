@@ -11,8 +11,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Redirect ke login jika session expired
-      if (window.location.pathname !== '/login') {
+      const requestUrl = error.config?.url || ''
+      const isAuthCheck = requestUrl.includes('/auth/me')
+      // Jangan redirect kalau 401 dari checkAuth — itu normal untuk user yang belum login
+      if (!isAuthCheck && window.location.pathname !== '/login') {
         window.location.href = '/login'
       }
     }

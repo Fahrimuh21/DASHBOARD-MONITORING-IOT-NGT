@@ -8,7 +8,7 @@ router.get('/', requireAuth, async (req, res) => {
   try {
     if (isNurse(req)) {
       const [contacts] = await db.execute(
-        `SELECT u.id, u.name, u.email, u.phone, u.alamat, 'Pasien' AS position
+        `SELECT u.id, u.name, u.email, u.phone, u.alamat, u.profile_photo, 'Pasien' AS position
          FROM users u WHERE u.role = 'PASIEN' ORDER BY u.name ASC`
       );
       return jsonResponse(res, true, 'Kontak berhasil diambil.', {
@@ -17,7 +17,7 @@ router.get('/', requireAuth, async (req, res) => {
       });
     } else {
       const [contacts] = await db.execute(
-        `SELECT u.id, u.name, u.email, u.phone, u.alamat, 'Perawat' AS position
+        `SELECT u.id, u.name, u.email, u.phone, u.alamat, u.profile_photo, 'Perawat' AS position
          FROM users u WHERE u.role = 'PERAWAT' ORDER BY u.name ASC`
       );
       return jsonResponse(res, true, 'Kontak berhasil diambil.', {
