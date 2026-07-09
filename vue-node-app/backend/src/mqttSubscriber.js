@@ -13,30 +13,10 @@ const client = mqtt.connect(BROKER, {
   reconnectPeriod: 2000,
 });
 
-// ================= CONNECT =================
-client.on('connect', () => {
-  console.log('====================================');
-  console.log('✅ MQTT CONNECTED');
-  console.log('📡 BROKER:', BROKER);
-  console.log('📡 TOPIC :', TOPIC);
-  console.log('====================================');
-
-  client.subscribe(TOPIC, { qos: 1 }, (err) => {
-    if (err) {
-      console.log('❌ SUBSCRIBE ERROR:', err.message);
-    } else {
-      console.log('📡 SUBSCRIBE SUCCESS');
-    }
-  });
-});
 
 // ================= MESSAGE HANDLER =================
 client.on('message', async (topic, message) => {
   try {
-    console.log('====================================');
-    console.log('🔥 MQTT MESSAGE RECEIVED');
-    console.log('📡 TOPIC:', topic);
-    console.log('📦 RAW:', message.toString());
 
     const data = JSON.parse(message.toString());
 
@@ -44,7 +24,6 @@ client.on('message', async (topic, message) => {
     const co2_ppm = parseFloat(data.co2_value);
 
     if (!device_code || isNaN(co2_ppm)) {
-      console.log('❌ INVALID PAYLOAD');
       return;
     }
 
@@ -55,7 +34,6 @@ client.on('message', async (topic, message) => {
     );
 
     if (!device.length) {
-      console.log('❌ DEVICE NOT FOUND:', device_code);
       return;
     }
 
@@ -64,9 +42,6 @@ client.on('message', async (topic, message) => {
     // ================= INGEST (live update + hourly/danger persistence + alert) =================
     const result = await ReadingIngestService.ingest(device_id, co2_ppm, null);
 
-    console.log('✅ LIVE UPDATE:', co2_ppm, 'risk:', result.status.risk_level, result.readingId ? `(saved as reading #${result.readingId})` : '(live only)');
-    console.log('====================================');
-
   } catch (err) {
     console.log('❌ MQTT ERROR:', err.message);
   }
@@ -74,17 +49,17 @@ client.on('message', async (topic, message) => {
 
 // ================= ERROR HANDLER =================
 client.on('error', (err) => {
-  console.log('❌ MQTT ERROR:', err.message);
+  console.log('MQTT ERROR:', err.message);
 });
 
 client.on('reconnect', () => {
-  console.log('🔄 MQTT RECONNECTING...');
+  console.log('MQTT RECONNECTING...');
 });
 
 client.on('close', () => {
-  console.log('⚠️ MQTT CONNECTION CLOSED');
+  console.log('MQTT CONNECTION CLOSED');
 });
 
-console.log('🚀 MQTT SUBSCRIBER STARTED');
+console.log('MQTT SUBSCRIBER STARTED');
 
 module.exports = client;
