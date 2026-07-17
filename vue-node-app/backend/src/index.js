@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
@@ -18,6 +19,12 @@ const profileRoutes = require('./routes/profile');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const isProduction = process.env.NODE_ENV === 'production';
+const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+
+if (isProduction) {
+  app.set('trust proxy', 1);
+}
 
 // MIDDLEWARE
 app.use(requestLogger);
@@ -39,9 +46,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,
+    secure: isProduction,
     maxAge: 8 * 60 * 60 * 1000,
-    sameSite: 'lax',
+    sameSite: isProduction ? 'none' : 'lax',
   },
 }));
 
@@ -61,6 +68,14 @@ app.get('/api/health', (req, res) => {
     mode: 'MQTT + HTTP HYBRID'
   });
 });
+
+if (isProduction) {
+  app.use(express.static(frontendDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    return res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
 
 // ERROR HANDLER
 app.use(errorHandler);

@@ -51,10 +51,6 @@ Pastikan perangkat berikut sudah tersedia:
 
 Jalankan schema berikut melalui MySQL CLI, phpMyAdmin, atau aplikasi database lain:
 
-```bash
-mysql -u root -p < vue-node-app/backend/schema.sql
-```
-
 Script tersebut membuat database `ngt_safe_co2`, tabel aplikasi, dan dua akun demo.
 
 > [!CAUTION]
@@ -76,6 +72,10 @@ DB_PASS=
 
 SESSION_SECRET=ganti-dengan-secret-yang-kuat
 OFFLINE_SECONDS=15
+
+# Opsional: notifikasi WhatsApp via Fonnte
+FONNTE_TOKEN=token-fonnte-anda
+FONNTE_API_URL=https://api.fonnte.com/send
 ```
 
 Kemudian instal dependensi backend:
@@ -188,7 +188,3 @@ Konfigurasi deployment production, HTTPS, penyimpanan session persisten, dan pen
 - Session masih menggunakan memory store bawaan Express dan belum cocok untuk deployment production multi-instance.
 - Fungsi pembacaan sensor pada firmware contoh masih berupa placeholder dan harus disesuaikan dengan sensor CO2 yang digunakan.
 - Status device dianggap offline jika tidak mengirim data melebihi nilai `OFFLINE_SECONDS`.
-
-## Lisensi
-
-Belum ada lisensi yang ditetapkan untuk proyek ini.

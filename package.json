@@ -1,0 +1,13 @@
+{
+  "name": "co2-temperature-iot-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix vue-node-app run install:all",
+    "build": "npm --prefix vue-node-app run build",
+    "start": "npm --prefix vue-node-app start"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

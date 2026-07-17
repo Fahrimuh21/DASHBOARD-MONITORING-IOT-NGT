@@ -106,8 +106,17 @@
         <div class="lp-hero__visual lp-hero-anim lp-hero-anim--right" style="--d:.3s">
           <div class="lp-card-3d">
             <div class="lp-switcher">
-              <img :src="logoUrl"   alt="Logo"   class="lp-switcher__logo"   />
-              <img :src="mascotUrl" alt="Maskot" class="lp-switcher__mascot" />
+              <img
+                v-for="(item, i) in switcherItems"
+                :key="item.alt"
+                :src="item.src"
+                :alt="item.alt"
+                class="lp-switcher__item"
+                :style="{
+                  '--switcher-delay': `${i * 2.4}s`,
+                  '--switcher-duration': '16.8s'
+                }"
+              />
             </div>
           </div>
           <div class="lp-pill lp-pill--a">
@@ -325,6 +334,11 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import logoUrl   from '@/assets/logo-pkm-erfat.png'
 import mascotUrl  from '@/assets/MaskotNaspion.png'
+import SimbelmawaUrl  from '@/assets/Simbelmawa.png'
+import PKMUrl  from '@/assets/PKM.png'
+import KemdiktiUrl  from '@/assets/Kemdikti.png'
+import BelmawaUrl  from '@/assets/Belmawa.png'
+import DiktiUrl  from '@/assets/Dikti.png'
 import salsaPhoto  from '@/assets/Salsa-Project Leader.png'
 import erfatPhoto  from '@/assets/Erfat-Clinical Research.png'
 import fatikaPhoto from '@/assets/Fatika-Clinical Validation.png'
@@ -336,6 +350,16 @@ import adhePhoto   from '@/assets/Adhe Setya Pramayoga, S.kom., M.T-Pembina..png
 const scrolled   = ref(false)
 const mobileOpen = ref(false)
 const close = () => { mobileOpen.value = false }
+
+const switcherItems = [
+  { src: logoUrl, alt: 'Logo Naspiotech' },
+  { src: mascotUrl, alt: 'Maskot Naspion' },
+  { src: SimbelmawaUrl, alt: 'Simbelmawa' },
+  { src: PKMUrl, alt: 'PKM' },
+  { src: KemdiktiUrl, alt: 'Kemdikti' },
+  { src: BelmawaUrl, alt: 'Belmawa' },
+  { src: DiktiUrl, alt: 'Dikti' },
+]
 
 /* ── Scroll lock (preserves position + hides scrollbar jump) ── */
 let savedY = 0
@@ -997,26 +1021,23 @@ function cAdvance() {
   overflow: hidden;
 }
 .lp-switcher { position: relative; width: 70%; height: 70%; }
-.lp-switcher__logo,
-.lp-switcher__mascot {
+.lp-switcher__item {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
   object-fit: contain;
-  animation-duration: 8s;
+  opacity: 0;
+  transform: scale(.92);
+  animation-name: lpSwitcherItem;
+  animation-duration: var(--switcher-duration);
+  animation-delay: var(--switcher-delay);
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
 }
-.lp-switcher__logo   { animation-name: lpLogo; }
-.lp-switcher__mascot { animation-name: lpMascot; }
-@keyframes lpLogo {
-  0%, 40%  { opacity:1; transform:scale(1); }
-  50%,100% { opacity:0; transform:scale(.92); }
-}
-@keyframes lpMascot {
-  0%, 44%  { opacity:0; transform:scale(.92); }
-  56%, 92% { opacity:1; transform:scale(1); }
-  100%     { opacity:0; transform:scale(.92); }
+@keyframes lpSwitcherItem {
+  0%, 7%    { opacity: 0; transform: scale(.92); }
+  10%, 20%  { opacity: 1; transform: scale(1); }
+  24%, 100% { opacity: 0; transform: scale(.92); }
 }
 
 /* Floating pills */

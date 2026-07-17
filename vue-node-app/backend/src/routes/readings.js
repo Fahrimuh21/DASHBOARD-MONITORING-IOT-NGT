@@ -7,28 +7,29 @@ const readingIngestService = require('../services/ReadingIngestService');
 // POST /api/sensor/reading  — endpoint untuk ESP32
 router.post('/sensor/reading', async (req, res) => {
   try {
-    const token = req.headers['x-device-token'] || '';
-    const { device_code, co2_ppm, co2_percent } = req.body || {};
+    const { device_code, co2_value, co2_ppm, co2_percent, device_token } = req.body || {};
+    const token = req.headers['x-device-token'] || device_token || '';
 
     if (!token || !device_code) {
       return jsonResponse(res, false, 'device_code dan x-device-token wajib diisi.', null, 400);
     }
 
-    const hasPpm = co2_ppm !== undefined && co2_ppm !== null;
+    const rawPpm = co2_value ?? co2_ppm;
+    const hasPpm = rawPpm !== undefined && rawPpm !== null;
     const hasPercent = co2_percent !== undefined && co2_percent !== null;
 
     if (!hasPpm && !hasPercent) {
       return jsonResponse(res, false, 'co2_ppm atau co2_percent wajib dikirim.', null, 400);
     }
 
-    if (hasPpm && isNaN(parseFloat(co2_ppm))) {
-      return jsonResponse(res, false, 'Nilai co2_ppm harus numerik.', null, 422);
+    if (hasPpm && isNaN(parseFloat(rawPpm))) {
+      return jsonResponse(res, false, 'Nilai co2_value/co2_ppm harus numerik.', null, 422);
     }
     if (hasPercent && isNaN(parseFloat(co2_percent))) {
       return jsonResponse(res, false, 'Nilai co2_percent harus numerik.', null, 422);
     }
 
-    let ppm = hasPpm ? parseFloat(co2_ppm) : parseFloat(co2_percent) * 10000;
+    let ppm = hasPpm ? parseFloat(rawPpm) : parseFloat(co2_percent) * 10000;
     let pct = hasPercent ? parseFloat(co2_percent) : ppm / 10000;
 
     if (ppm < 0 || pct < 0) {
@@ -124,10 +125,16 @@ router.get('/latest', requireAuth, async (req, res) => {
       devParams
     );
 
-    const result = devices.map((d) => ({
-      ...d,
-      connection_status: onlineStatus(d.last_seen_at),
-    }));
+    const result = devices.map((d) => {
+      const connectionStatus = onlineStatus(d.last_seen_at);
+
+      return {
+        ...d,
+        co2_ppm: connectionStatus === 'OFFLINE' ? 0 : d.co2_ppm,
+        co2_percent: connectionStatus === 'OFFLINE' ? 0 : d.co2_percent,
+        connection_status: connectionStatus,
+      };
+    });
 
     return jsonResponse(res, true, 'Data terbaru berhasil diambil.', { devices: result });
   } catch (err) {
