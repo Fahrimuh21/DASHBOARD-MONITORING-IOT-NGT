@@ -339,6 +339,7 @@ import PKMUrl  from '@/assets/PKM.png'
 import KemdiktiUrl  from '@/assets/Kemdikti.png'
 import BelmawaUrl  from '@/assets/Belmawa.png'
 import DiktiUrl  from '@/assets/Dikti.png'
+import UndipUrl from '@/assets/UNDIP.png'
 import salsaPhoto  from '@/assets/Salsa-Project Leader.png'
 import erfatPhoto  from '@/assets/Erfat-Clinical Research.png'
 import fatikaPhoto from '@/assets/Fatika-Clinical Validation.png'
@@ -359,6 +360,7 @@ const switcherItems = [
   { src: KemdiktiUrl, alt: 'Kemdikti' },
   { src: BelmawaUrl, alt: 'Belmawa' },
   { src: DiktiUrl, alt: 'Dikti' },
+  { src: UndipUrl, alt: 'UNDIP'}
 ]
 
 /* ── Scroll lock (preserves position + hides scrollbar jump) ── */

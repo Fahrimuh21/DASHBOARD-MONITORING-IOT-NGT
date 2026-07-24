@@ -90,14 +90,15 @@
             <template #icon><svg viewBox="0 0 24 24" class="icon-co2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></template>
           </StatCard>
 
-          <StatCard
-            title="Tren 1 Jam Terakhir"
-            :value="(device.co2_trend === 'NAIK' ? '+' : (device.co2_trend === 'TURUN' ? '-' : '')) + (device.delta_co2_ppm || 0)"
-            unit="ppm"
-            type="trend"
-          >
-            <template #icon><svg viewBox="0 0 24 24" class="icon-trend"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg></template>
-          </StatCard>
+          <BaselineCard
+            :baselinePpm="device.baseline_ppm"
+            :currentPpm="device.co2_ppm"
+            :deviationPpm="device.deviation_ppm"
+            :deviationPercent="device.deviation_percent"
+            :baselineStatus="device.baseline_status"
+            :baselineValid="device.baseline_valid"
+            :baselineState="device.baseline_state"
+          />
 
           <StatCard
             title="Status Perangkat"
@@ -131,7 +132,7 @@
             <div class="co2-chart-layout">
               <div class="co2-donut-wrap">
                 <Co2Donut
-                  :ppm="device.co2_ppm"
+                  :ppm="getDonutPpm(device)"
                   :percent="device.co2_percent"
                   :riskClass="getDonutRiskClass(device.risk_level)"
                   :isOnline="device.connection_status === 'ONLINE'"
@@ -189,6 +190,7 @@
                       <small style="color:var(--text-soft)">{{ formatTimeOnly(alert.created_at) }}</small>
                     </div>
                     <span style="font-size:12px; color:var(--text-soft)">{{ alert.title }}</span>
+                    <span v-if="alert.message" style="display:block; font-size:12px; color:var(--text); margin-top:2px;">{{ alert.message }}</span>
                   </div>
                 </div>
               </template>
@@ -209,6 +211,7 @@ import AppNavbar from '@/components/AppNavbar.vue'
 import BottomNavbar from '@/components/BottomNavbar.vue'
 import Co2Donut from '@/components/Co2Donut.vue'
 import StatCard from '@/components/StatCard.vue'
+import BaselineCard from '@/components/BaselineCard.vue'
 import StatusBadge from '@/components/StatusBadge.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
@@ -247,6 +250,15 @@ const getDonutRiskClass = (riskLevel) => {
   return 'risk-low'
 }
 
+const isBaselineValid = (device) => {
+  return device?.baseline_valid === true || device?.baseline_valid === 1 || device?.baseline_valid === '1'
+}
+
+const getDonutPpm = (device) => {
+  if (!device || device.connection_status !== 'ONLINE' || !isBaselineValid(device)) return 0
+  return device.deviation_ppm ?? 0
+}
+
 const getRiskLabel = (riskLevel, connectionStatus) => {
   if (connectionStatus === 'OFFLINE') return 'Offline'
   if (riskLevel === 'HIGH') return 'Bahaya'
@@ -282,6 +294,8 @@ const formatTimeOnly = (val) => {
 
 const formatNgtStatus = (status) => {
   if (!status) return 'Aman'
+  if (status === 'NORMAL') return 'Aman'
+  if (status === 'DANGER') return 'Bahaya'
   if (status === 'TERINDIKASI_NON_RESPIRATORIK') return 'Aman'
   if (status === 'PERLU_VERIFIKASI') return 'Waspada'
   if (status === 'RISIKO_MALPOSISI_RESPIRATORIK') return 'Bahaya'
@@ -294,5 +308,3 @@ const handleAlertClick = (alert) => {
   }
 }
 </script>
-
-

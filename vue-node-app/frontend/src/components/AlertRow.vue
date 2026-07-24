@@ -3,6 +3,9 @@
     <span class="status-dot" :class="riskClass"></span>
     <div>
       <strong>{{ alert.title }}</strong>
+      <small v-if="alert.message" style="display:block; color:var(--text); font-size:12px; margin-top:2px;">
+        {{ alert.message }}
+      </small>
       <small style="display:block; color:var(--text-soft); font-size:12px; margin-top:2px;">
         {{ alert.device_name }} &middot; {{ formattedDate }}
       </small>

@@ -67,12 +67,12 @@ class Mailer {
       from: `"Naspiontech" <${FROM}>`,
       to: toEmail,
       subject,
-      text: `${greeting}\n\nAlat "${deviceName}" mendeteksi kondisi berbahaya (risiko tinggi NGT).\n\nKadar CO2: ${ppm} ppm\nStatus: ${message}\nWaktu: ${occurredAt}\n\n${dangerGuidanceText}`,
+      text: `${greeting}\n\nAlat "${deviceName}" mendeteksi kondisi berbahaya.\n\nKadar CO2: ${ppm} ppm\nStatus: ${message}\nWaktu: ${occurredAt}\n\n${dangerGuidanceText}`,
       html: `
         <div style="font-family:sans-serif; max-width:480px; margin:0 auto;">
           <h2 style="color:#dc2626;">Posisi selang kemungkinan berada di saluran pernapasan</h2>
           <p>${greeting}</p>
-          <p>Alat <strong>${deviceName}</strong> mendeteksi kondisi <strong style="color:#dc2626;">berbahaya (risiko tinggi NGT)</strong>.</p>
+          <p>Alat <strong>${deviceName}</strong> mendeteksi kondisi <strong style="color:#dc2626;">berbahaya</strong>.</p>
           <table style="width:100%; border-collapse:collapse; margin:12px 0;">
             <tr><td style="padding:4px 0; color:#666;">Kadar CO2</td><td style="font-weight:700;">${ppm} ppm</td></tr>
             <tr><td style="padding:4px 0; color:#666;">Status</td><td>${message}</td></tr>

@@ -468,6 +468,207 @@ svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width:
 }
 
 /* =========================================================
+   Baseline Card
+   ========================================================= */
+.baseline-card {
+  min-height: 112px;
+  padding: 14px 16px;
+  grid-row: span 1;
+}
+.baseline-card::before { background: var(--teal) !important; }
+.baseline-card::after { background: rgba(20, 184, 166, .10) !important; }
+
+.baseline-card .icon-baseline {
+  width: 18px;
+  height: 18px;
+  color: var(--teal);
+}
+
+/* Waiting state */
+.baseline-waiting-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.baseline-waiting-pulse {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: var(--muted);
+  animation: baseline-pulse 1.6s ease-in-out infinite;
+}
+@keyframes baseline-pulse {
+  0%, 100% { opacity: .35; transform: scale(.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.baseline-waiting-text {
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Active baseline */
+.baseline-active-state {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+.baseline-main-value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.baseline-main-value strong {
+  color: var(--text);
+  font-size: clamp(17px, 1.6vw, 23px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  transition: color .3s var(--ease);
+}
+.baseline-unit {
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Detail row */
+.baseline-detail-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.baseline-detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.baseline-detail-label {
+  color: var(--text-soft);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.baseline-detail-value {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.baseline-detail-value small {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+/* Deviation color coding */
+.baseline-detail-item.deviation.baseline-sangat-stabil .baseline-detail-value,
+.baseline-detail-item.deviation.baseline-stabil .baseline-detail-value {
+  color: #047857;
+}
+.baseline-detail-item.deviation.baseline-observasi .baseline-detail-value {
+  color: #92400e;
+}
+.baseline-detail-item.deviation.baseline-deviasi .baseline-detail-value {
+  color: #b91c1c;
+}
+
+/* Progress bar */
+.baseline-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.baseline-progress-track {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .06);
+  overflow: hidden;
+}
+.baseline-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ok);
+  transition: width .5s var(--ease), background .3s var(--ease);
+  min-width: 2px;
+}
+.baseline-progress-fill.baseline-sangat-stabil,
+.baseline-progress-fill.baseline-stabil { background: var(--ok); }
+.baseline-progress-fill.baseline-observasi { background: var(--warn); }
+.baseline-progress-fill.baseline-deviasi { background: var(--danger); }
+.baseline-progress-fill.baseline-waiting { background: var(--muted); }
+.baseline-progress-label {
+  flex: 0 0 auto;
+  color: var(--text-soft);
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 34px;
+  text-align: right;
+}
+
+/* Status badge */
+.baseline-status-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  width: fit-content;
+  transition: all .3s var(--ease);
+}
+.baseline-status-icon { font-size: 10px; line-height: 1; }
+.baseline-status-label { letter-spacing: .02em; }
+
+.baseline-status-row.baseline-sangat-stabil {
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid rgba(16, 185, 129, .24);
+}
+.baseline-status-row.baseline-stabil {
+  color: #047857;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border: 1px solid rgba(16, 185, 129, .28);
+}
+.baseline-status-row.baseline-observasi {
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px solid rgba(245, 158, 11, .28);
+}
+.baseline-status-row.baseline-deviasi {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid rgba(239, 68, 68, .28);
+  animation: baseline-alert-pulse 2s ease-in-out infinite;
+}
+.baseline-status-row.baseline-waiting {
+  color: var(--text-soft);
+  background: #f1f5f9;
+  border: 1px solid rgba(100, 116, 139, .18);
+}
+
+@keyframes baseline-alert-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(239, 68, 68, .12); }
+}
+
+/* Accent bar color per status */
+.baseline-card.baseline-sangat-stabil::before,
+.baseline-card.baseline-stabil::before { background: var(--ok) !important; }
+.baseline-card.baseline-observasi::before { background: var(--warn) !important; }
+.baseline-card.baseline-deviasi::before { background: var(--danger) !important; }
+.baseline-card.baseline-waiting::before { background: var(--muted) !important; }
+
+/* =========================================================
    Buttons / forms
    ========================================================= */
 .btn {

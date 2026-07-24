@@ -4,6 +4,7 @@ const trendService = require('./TrendService');
 const alertService = require('./AlertService');
 const mailer = require('./Mailer');
 const whatsAppNotifier = require('./WhatsAppNotifier');
+const baselineService = require('./BaselineService');
 
 const DANGER_NOTIFICATION_INTERVAL_MINUTES = parseInt(process.env.DANGER_NOTIFICATION_INTERVAL_MINUTES || '5');
 
@@ -25,7 +26,9 @@ class ReadingIngestService {
    * Hanya menulis ke tabel `readings` (riwayat) saat masuk jam baru atau saat HIGH (danger).
    * Alert bahaya dibuat ulang maksimal setiap beberapa menit selama status tetap HIGH.
    */
-  async ingest(deviceId, ppm, pct = null) {
+  async ingest(deviceId, ppm, pct = null, metadata = {}) {
+    await baselineService.ensureSchema();
+
     const [deviceRows] = await db.execute(
       'SELECT live_risk_level, device_name, user_id FROM devices WHERE id = ? LIMIT 1',
       [deviceId]
@@ -41,19 +44,26 @@ class ReadingIngestService {
     const lastReading = lastReadingRows[0] || null;
     const previousPersistedPpm = lastReading ? parseFloat(lastReading.co2_ppm) : null;
 
-    const status = ngtStatusService.evaluate(ppm);
     const trend = trendService.calculate(ppm, previousPersistedPpm);
+    const baseline = await baselineService.calculate(deviceId, ppm, metadata);
+    const status = ngtStatusService.evaluate(ppm, baseline);
     const isHigh = status.risk_level === 'HIGH';
 
     await db.execute(
       `UPDATE devices SET
          live_co2_ppm = ?, live_co2_percent = ?, live_previous_co2_ppm = ?, live_delta_co2_ppm = ?,
          live_co2_trend = ?, live_ngt_status = ?, live_risk_level = ?, live_message = ?,
+         live_baseline_ppm = ?, live_deviation_ppm = ?, live_deviation_percent = ?,
+         live_baseline_status = ?, live_baseline_valid = ?, live_baseline_state = ?,
+         live_baseline_range_ppm = ?, live_baseline_stddev_ppm = ?, live_baseline_slope_ppm_min = ?,
          last_seen_at = NOW(), updated_at = NOW()
        WHERE id = ?`,
       [
         ppm, pct, trend.previous_co2_ppm, trend.delta_co2_ppm,
         trend.co2_trend, status.ngt_status, status.risk_level, status.message,
+        baseline.baseline_ppm, baseline.deviation_ppm, baseline.deviation_percent,
+        baseline.baseline_status, baseline.baseline_valid ? 1 : 0, baseline.baseline_state,
+        baseline.baseline_range_ppm, baseline.baseline_stddev_ppm, baseline.baseline_slope_ppm_min,
         deviceId,
       ]
     );
@@ -63,10 +73,15 @@ class ReadingIngestService {
       const [result] = await db.execute(
         `INSERT INTO readings
           (device_id, co2_ppm, co2_percent, previous_co2_ppm, delta_co2_ppm, co2_trend,
+           baseline_ppm, deviation_ppm, deviation_percent, baseline_status, baseline_valid,
+           baseline_state, baseline_range_ppm, baseline_stddev_ppm, baseline_slope_ppm_min,
            respiratory_pattern_detected, ngt_status, risk_level, message, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
         [
           deviceId, ppm, pct, trend.previous_co2_ppm, trend.delta_co2_ppm, trend.co2_trend,
+          baseline.baseline_ppm, baseline.deviation_ppm, baseline.deviation_percent,
+          baseline.baseline_status, baseline.baseline_valid ? 1 : 0,
+          baseline.baseline_state, baseline.baseline_range_ppm, baseline.baseline_stddev_ppm, baseline.baseline_slope_ppm_min,
           isHigh ? 1 : 0, status.ngt_status, status.risk_level, status.message,
         ]
       );
@@ -82,7 +97,7 @@ class ReadingIngestService {
       });
     }
 
-    return { co2_ppm: ppm, co2_percent: pct, status, trend, readingId };
+    return { co2_ppm: ppm, co2_percent: pct, status, trend, baseline, readingId };
   }
 
   async shouldNotifyDanger(deviceId, previousLiveRisk) {
@@ -107,7 +122,7 @@ class ReadingIngestService {
 
   async notifyDanger(deviceName, patientUserId, ppm, message) {
     const [recipients] = await db.execute(
-      `SELECT name, email, phone FROM users WHERE role = 'PERAWAT'${patientUserId ? ' OR id = ?' : ''}`,
+      `SELECT DISTINCT id, name, email, phone FROM users WHERE role = 'PERAWAT'${patientUserId ? ' OR id = ?' : ''}`,
       patientUserId ? [patientUserId] : []
     );
     if (!recipients.length) return;

@@ -43,7 +43,7 @@ const co2Status = computed(() => {
 
 const MAX_PPM = 3000
 const gaugeProgress = computed(() => {
-  const value = Math.min(Number(props.ppm) || 0, MAX_PPM)
+  const value = Math.min(Math.max(Number(props.ppm) || 0, 0), MAX_PPM)
   return `${(value / MAX_PPM) * 100}%`
 })
 </script>

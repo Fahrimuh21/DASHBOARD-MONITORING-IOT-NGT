@@ -3,11 +3,26 @@ const db = require('../config/db');
 const { requireAuth } = require('../middleware/auth');
 const { deviceAccessClause, onlineStatus, formatDatetime, isNurse, jsonResponse } = require('../helpers');
 const readingIngestService = require('../services/ReadingIngestService');
+const baselineService = require('../services/BaselineService');
 
 // POST /api/sensor/reading  — endpoint untuk ESP32
-router.post('/sensor/reading', async (req, res) => {
+router.post(['/sensor/reading', '/reading', '/'], async (req, res) => {
   try {
-    const { device_code, co2_value, co2_ppm, co2_percent, device_token } = req.body || {};
+    const {
+      device_code,
+      co2_value,
+      co2_ppm,
+      co2_percent,
+      device_token,
+      baseline_valid,
+      baseline_ppm,
+      delta_ppm,
+      range_ppm,
+      stddev_ppm,
+      baseline_stddev_ppm,
+      slope_ppm_min,
+      bench_state,
+    } = req.body || {};
     const token = req.headers['x-device-token'] || device_token || '';
 
     if (!token || !device_code) {
@@ -46,7 +61,15 @@ router.post('/sensor/reading', async (req, res) => {
       return jsonResponse(res, false, 'Device tidak valid atau token salah.', null, 401);
     }
 
-    const result = await readingIngestService.ingest(device.id, ppm, pct);
+    const result = await readingIngestService.ingest(device.id, ppm, pct, {
+      baseline_valid,
+      baseline_ppm,
+      delta_ppm,
+      range_ppm,
+      stddev_ppm: stddev_ppm ?? baseline_stddev_ppm,
+      slope_ppm_min,
+      bench_state,
+    });
 
     return jsonResponse(res, true, 'Data pembacaan CO2 berhasil disimpan.', {
       device_code,
@@ -106,6 +129,8 @@ router.get('/', requireAuth, async (req, res) => {
 // GET /api/readings/latest — data terbaru per device (untuk dashboard polling)
 router.get('/latest', requireAuth, async (req, res) => {
   try {
+    await baselineService.ensureSchema();
+
     const { where: devWhere, params: devParams } = deviceAccessClause(req, 'd');
     const whereSql = devWhere ? `WHERE ${devWhere}` : '';
 
@@ -116,7 +141,16 @@ router.get('/latest', requireAuth, async (req, res) => {
               d.live_previous_co2_ppm AS previous_co2_ppm, d.live_delta_co2_ppm AS delta_co2_ppm,
               d.live_co2_trend AS co2_trend, d.live_ngt_status AS ngt_status,
               d.live_risk_level AS risk_level, d.live_message AS message,
-              d.last_seen_at AS reading_at
+              d.last_seen_at AS reading_at,
+              d.live_baseline_ppm AS baseline_ppm,
+              d.live_deviation_ppm AS deviation_ppm,
+              d.live_deviation_percent AS deviation_percent,
+              d.live_baseline_status AS baseline_status,
+              d.live_baseline_valid AS baseline_valid,
+              d.live_baseline_state AS baseline_state,
+              d.live_baseline_range_ppm AS baseline_range_ppm,
+              d.live_baseline_stddev_ppm AS baseline_stddev_ppm,
+              d.live_baseline_slope_ppm_min AS baseline_slope_ppm_min
        FROM devices d
        LEFT JOIN users u ON u.id = d.user_id
        ${whereSql}

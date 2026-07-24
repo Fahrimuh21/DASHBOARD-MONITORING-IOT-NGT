@@ -82,6 +82,8 @@ const getRiskClass = (riskLevel, connectionStatus) => {
 
 const formatNgtStatus = (status) => {
   if (!status) return 'Aman'
+  if (status === 'NORMAL') return 'Aman'
+  if (status === 'DANGER') return 'Bahaya'
   if (status === 'TERINDIKASI_NON_RESPIRATORIK') return 'Aman'
   if (status === 'PERLU_VERIFIKASI') return 'Waspada'
   if (status === 'RISIKO_MALPOSISI_RESPIRATORIK') return 'Bahaya'

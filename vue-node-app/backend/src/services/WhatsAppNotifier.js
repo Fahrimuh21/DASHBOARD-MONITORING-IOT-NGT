@@ -56,7 +56,7 @@ class WhatsAppNotifier {
       '*🔴Posisi selang kemungkinan berada di saluran pernapasan - Naspiontech*',
       '',
       greeting,
-      `Alat "${deviceName}" mendeteksi kondisi berbahaya (risiko tinggi NGT).`,
+      `Alat "${deviceName}" mendeteksi kondisi berbahaya.`,
       '',
       `Kadar CO2: ${ppm} ppm`,
       `Status: ${message}`,

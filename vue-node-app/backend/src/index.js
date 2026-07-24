@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
@@ -21,6 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const isProduction = process.env.NODE_ENV === 'production';
 const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
+const frontendDistExists = fs.existsSync(frontendDistPath);
 
 if (isProduction) {
   app.set('trust proxy', 1);
@@ -69,12 +71,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-if (isProduction) {
+if (frontendDistExists) {
   app.use(express.static(frontendDistPath));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) return next();
     return res.sendFile(path.join(frontendDistPath, 'index.html'));
   });
+} else if (isProduction) {
+  console.warn('WARNING: frontend/dist tidak ditemukan. Pastikan frontend sudah dibuild dengan `npm --prefix frontend run build`.');
 }
 
 // ERROR HANDLER

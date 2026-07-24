@@ -11,8 +11,22 @@
 
     <div v-if="loading" class="spinner"></div>
     
-    <div v-else-if="contacts.length === 0" class="empty">
-      Belum ada data kontak.
+    <div v-else-if="contacts.length === 0" class="empty card" style="padding: 32px; text-align: center;">
+      <svg style="width:48px; height:48px; fill:none; stroke:var(--text-soft); stroke-width:1.5; margin-bottom:12px;" viewBox="0 0 24 24">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      <p style="color:var(--text-dark); font-weight:600; font-size:15px; margin-bottom:6px;">
+        {{ emptyMessage || 'Belum ada data kontak.' }}
+      </p>
+      <p style="color:var(--text-soft); font-size:13px; max-width:360px; margin:0 auto 16px;">
+        Kontak disembunyikan sampai akun terhubung dengan token perangkat.
+      </p>
+      <router-link to="/connect-device" class="btn primary sm" style="display:inline-flex; align-items:center; gap:6px;">
+        Hubungkan Perangkat
+      </router-link>
     </div>
 
     <div v-else class="contact-grid">
@@ -67,6 +81,7 @@ import api from '@/api'
 
 const contacts = ref([])
 const roleLabel = ref('')
+const emptyMessage = ref('')
 const loading = ref(false)
 
 onMounted(async () => {
@@ -76,6 +91,7 @@ onMounted(async () => {
     if (data.success) {
       contacts.value = data.data.contacts
       roleLabel.value = data.data.role_label
+      emptyMessage.value = data.data.message || ''
     }
   } catch (error) {
     console.error(error)

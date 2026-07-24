@@ -33,7 +33,7 @@ client.on('message', async (topic, message) => {
         const data = JSON.parse(message.toString());
 
         const device_code = data.device_code;
-        const co2_ppm = parseFloat(data.co2_value);
+        const co2_ppm = parseFloat(data.co2_value ?? data.co2_ppm);
 
         if (!device_code) {
             console.warn('[MQTT] Message ignored: device_code is empty');
@@ -62,7 +62,16 @@ client.on('message', async (topic, message) => {
         await ReadingIngestService.ingest(
             device_id,
             co2_ppm,
-            null
+            null,
+            {
+                baseline_valid: data.baseline_valid,
+                baseline_ppm: data.baseline_ppm,
+                delta_ppm: data.delta_ppm,
+                range_ppm: data.range_ppm,
+                stddev_ppm: data.stddev_ppm ?? data.baseline_stddev_ppm,
+                slope_ppm_min: data.slope_ppm_min,
+                bench_state: data.bench_state,
+            }
         );
 
         console.log(`[MQTT] Reading saved: ${device_code} (${co2_ppm} ppm)`);

@@ -35,10 +35,6 @@ router.post('/login', async (req, res) => {
     if (!user.email_verified_at) {
       // Generate OTP baru untuk verifikasi
       const otp = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
-      const otpExpires = new Date(Date.now() + 15 * 60 * 1000)
-        .toISOString()
-        .slice(0, 19)
-        .replace('T', ' ');
 
       try {
         await mailer.sendOtp(user.email, otp, 'verify');
@@ -48,8 +44,8 @@ router.post('/login', async (req, res) => {
       }
 
       await db.execute(
-        'UPDATE users SET otp_code = ?, otp_expires_at = ?, updated_at = NOW() WHERE id = ?',
-        [otp, otpExpires, user.id]
+        'UPDATE users SET otp_code = ?, otp_expires_at = DATE_ADD(NOW(), INTERVAL 15 MINUTE), updated_at = NOW() WHERE id = ?',
+        [otp, user.id]
       );
 
       req.session.pending_verify_email = user.email;
@@ -113,10 +109,6 @@ router.post('/register', async (req, res) => {
       }
       // Email ada tapi belum diverifikasi — kirim ulang OTP
       const otp = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
-      const otpExpires = new Date(Date.now() + 15 * 60 * 1000)
-        .toISOString()
-        .slice(0, 19)
-        .replace('T', ' ');
       try {
         await mailer.sendOtp(email, otp, 'verify');
       } catch (mailErr) {
@@ -124,18 +116,14 @@ router.post('/register', async (req, res) => {
         return jsonResponse(res, false, 'Gagal mengirim kode OTP ke email. Periksa konfigurasi email server.', null, 502);
       }
       await db.execute(
-        'UPDATE users SET otp_code = ?, otp_expires_at = ?, updated_at = NOW() WHERE id = ?',
-        [otp, otpExpires, existing[0].id]
+        'UPDATE users SET otp_code = ?, otp_expires_at = DATE_ADD(NOW(), INTERVAL 15 MINUTE), updated_at = NOW() WHERE id = ?',
+        [otp, existing[0].id]
       );
       req.session.pending_verify_email = email;
       return jsonResponse(res, true, 'Email sudah terdaftar namun belum diverifikasi. Kode OTP baru telah dikirim.', { email }, 200);
     }
 
     const otp = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
-    const otpExpires = new Date(Date.now() + 15 * 60 * 1000)
-      .toISOString()
-      .slice(0, 19)
-      .replace('T', ' ');
 
     // Kirim email dulu — jangan buat akun jika OTP gagal terkirim.
     try {
@@ -149,8 +137,8 @@ router.post('/register', async (req, res) => {
 
     await db.execute(
       `INSERT INTO users (name, email, password, role, phone, alamat, otp_code, otp_expires_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-      [name, email, hashedPassword, selectedRole, phone, alamat || null, otp, otpExpires]
+       VALUES (?, ?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL 15 MINUTE), NOW(), NOW())`,
+      [name, email, hashedPassword, selectedRole, phone, alamat || null, otp]
     );
 
     req.session.pending_verify_email = email;
@@ -185,7 +173,12 @@ router.post('/verify-email', async (req, res) => {
       return jsonResponse(res, false, 'OTP tidak valid.', null, 400);
     }
 
-    if (new Date(user.otp_expires_at) < new Date()) {
+    // Bandingkan langsung di SQL agar timezone konsisten
+    const [expCheck] = await db.execute(
+      'SELECT otp_expires_at < NOW() AS is_expired FROM users WHERE id = ?',
+      [user.id]
+    );
+    if (expCheck[0]?.is_expired) {
       return jsonResponse(res, false, 'OTP sudah kadaluarsa.', null, 400);
     }
 
@@ -214,10 +207,6 @@ router.post('/forgot-password', async (req, res) => {
     }
 
     const otp = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
-    const otpExpires = new Date(Date.now() + 15 * 60 * 1000)
-      .toISOString()
-      .slice(0, 19)
-      .replace('T', ' ');
 
     try {
       await mailer.sendOtp(email, otp, 'reset');
@@ -227,8 +216,8 @@ router.post('/forgot-password', async (req, res) => {
     }
 
     await db.execute(
-      'UPDATE users SET otp_code = ?, otp_expires_at = ?, updated_at = NOW() WHERE id = ?',
-      [otp, otpExpires, rows[0].id]
+      'UPDATE users SET otp_code = ?, otp_expires_at = DATE_ADD(NOW(), INTERVAL 15 MINUTE), updated_at = NOW() WHERE id = ?',
+      [otp, rows[0].id]
     );
 
     return jsonResponse(res, true, 'OTP reset password telah dikirim ke email Anda.', {
@@ -264,7 +253,13 @@ router.post('/reset-password', async (req, res) => {
     if (user.otp_code !== String(otp).trim()) {
       return jsonResponse(res, false, 'OTP tidak valid.', null, 400);
     }
-    if (new Date(user.otp_expires_at) < new Date()) {
+
+    // Bandingkan langsung di SQL agar timezone konsisten
+    const [expCheck] = await db.execute(
+      'SELECT otp_expires_at < NOW() AS is_expired FROM users WHERE id = ?',
+      [user.id]
+    );
+    if (expCheck[0]?.is_expired) {
       return jsonResponse(res, false, 'OTP sudah kadaluarsa.', null, 400);
     }
 
