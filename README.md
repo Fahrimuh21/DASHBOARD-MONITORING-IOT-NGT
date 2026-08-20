@@ -135,16 +135,33 @@ http://localhost:3001/api/health
 
 Perawat dapat mengelola beberapa pasien dan device. Pasien hanya dapat menghubungkan satu device ke akunnya.
 
-## Menghubungkan ESP32
+## Menghubungkan ESP32 melalui MQTT dan HTTPS
 
-Firmware contoh tersedia di `arduino/esp32_sensor_sender/esp32_sensor_sender.ino`. Sesuaikan konfigurasi berikut sebelum mengunggah firmware:
+Firmware tersedia di `arduino/esp32_http_direct/esp32_http_direct.ino`. ESP32 membaca SCD30 lalu mengirim JSON langsung melalui HTTPS ke REST API hosting. MQTT tetap digunakan sebagai jalur lokal/monitoring; backend MQTT bridge bersifat opsional. Install dependency dan aktifkan bridge bila diperlukan:
+
+```bash
+cd vue-node-app/backend
+npm install
+```
+
+Atur environment backend berikut:
+
+```text
+MQTT_BRIDGE_ENABLED=true
+MQTT_BROKER=mqtt://broker.hivemq.com
+MQTT_TOPIC=ngtpkmkcundip/co2/sensor/+
+MQTT_BACKEND_URL=https://api.naspiontech.com/api/sensor/reading
+MQTT_DEVICE_TOKEN=TOKEN_DEVICE
+```
+
+Sesuaikan konfigurasi Wi-Fi, topic, dan kode device sebelum mengunggah firmware:
 
 ```cpp
 const char* WIFI_SSID = "NAMA_WIFI";
 const char* WIFI_PASSWORD = "PASSWORD_WIFI";
-const char* SERVER_URL = "http://IP_KOMPUTER:3001/api/readings/sensor/reading";
-const char* DEVICE_CODE = "KODE_DEVICE";
-const char* DEVICE_TOKEN = "TOKEN_DEVICE";
+const char *MQTT_SERVER = "broker.hivemq.com";
+const char *MQTT_TOPIC = "ngtpkmkcundip/co2/sensor/001";
+const char *DEVICE_CODE = "001";
 ```
 
 Gunakan alamat IP komputer pada jaringan lokal, bukan `localhost`. `DEVICE_CODE` dan `DEVICE_TOKEN` harus sama dengan data device yang dibuat oleh akun perawat.
@@ -158,11 +175,7 @@ Contoh payload yang dikirim:
 }
 ```
 
-Token device dikirim melalui header:
-
-```text
-x-device-token: TOKEN_DEVICE
-```
+Token device dikirim oleh bridge melalui header `x-device-token`. Pastikan `DEVICE_CODE` dan token sama dengan data device yang dibuat oleh akun perawat. MQTT broker publik tidak mengenkripsi trafik; gunakan broker TLS dan kredensial MQTT pada deployment produksi.
 
 ## Build Production
 

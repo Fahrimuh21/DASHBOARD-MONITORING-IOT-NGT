@@ -6,8 +6,6 @@ const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
 
-require('./mqttSubscriber'); // MQTT START
-
 const errorHandler = require('./middleware/errorHandler');
 const requestLogger = require('./middleware/requestLogger');
 
@@ -17,6 +15,7 @@ const alertsRoutes = require('./routes/alerts');
 const devicesRoutes = require('./routes/devices');
 const contactsRoutes = require('./routes/contacts');
 const profileRoutes = require('./routes/profile');
+const startMqttBridge = require('./services/MqttBridge');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -67,7 +66,7 @@ app.use('/api/profile', profileRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    mode: 'MQTT + HTTP HYBRID'
+    mode: process.env.MQTT_BRIDGE_ENABLED === 'true' ? 'MQTT BRIDGE' : 'HTTP API'
   });
 });
 
@@ -89,8 +88,12 @@ app.listen(PORT, () => {
   console.log('====================================');
   console.log('🚀 BACKEND RUNNING');
   console.log(`🌐 http://localhost:${PORT}`);
-  console.log('📡 MQTT ACTIVE');
+  console.log(process.env.MQTT_BRIDGE_ENABLED === 'true'
+    ? '📡 MQTT BRIDGE ACTIVE'
+    : '📡 MQTT BRIDGE DISABLED');
   console.log('====================================');
 });
+
+startMqttBridge();
 
 module.exports = app;

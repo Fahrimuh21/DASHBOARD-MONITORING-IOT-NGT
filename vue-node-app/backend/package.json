@@ -14,7 +14,7 @@
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "express-validator": "^7.1.0",
-    "mqtt": "^5.15.1",
+    "mqtt": "^5.10.4",
     "mysql2": "^3.9.7",
     "nodemailer": "^9.0.1"
   },

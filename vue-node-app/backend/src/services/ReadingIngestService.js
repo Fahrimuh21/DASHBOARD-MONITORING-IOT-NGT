@@ -8,22 +8,21 @@ const baselineService = require('./BaselineService');
 
 const DANGER_NOTIFICATION_INTERVAL_MINUTES = parseInt(process.env.DANGER_NOTIFICATION_INTERVAL_MINUTES || '5');
 
-function isNewHourBucket(lastCreatedAt) {
+const READING_HISTORY_INTERVAL_MS = parseInt(
+  process.env.READING_HISTORY_INTERVAL_SECONDS || '30',
+  10
+) * 1000;
+
+function isHistoryIntervalElapsed(lastCreatedAt) {
   if (!lastCreatedAt) return true;
-  const last = new Date(lastCreatedAt);
-  const now = new Date();
-  return (
-    last.getFullYear() !== now.getFullYear() ||
-    last.getMonth() !== now.getMonth() ||
-    last.getDate() !== now.getDate() ||
-    last.getHours() !== now.getHours()
-  );
+  const lastTimestamp = new Date(lastCreatedAt).getTime();
+  return !Number.isFinite(lastTimestamp) || Date.now() - lastTimestamp >= READING_HISTORY_INTERVAL_MS;
 }
 
 class ReadingIngestService {
   /**
    * Selalu update live state device (untuk dashboard realtime tiap 5 detik).
-   * Hanya menulis ke tabel `readings` (riwayat) saat masuk jam baru atau saat HIGH (danger).
+    * Menulis ke tabel `readings` (riwayat) setiap interval dan segera saat HIGH (danger).
    * Alert bahaya dibuat ulang maksimal setiap beberapa menit selama status tetap HIGH.
    */
   async ingest(deviceId, ppm, pct = null, metadata = {}) {
@@ -69,7 +68,7 @@ class ReadingIngestService {
     );
 
     let readingId = null;
-    if (isHigh || isNewHourBucket(lastReading ? lastReading.created_at : null)) {
+    if (isHigh || isHistoryIntervalElapsed(lastReading ? lastReading.created_at : null)) {
       const [result] = await db.execute(
         `INSERT INTO readings
           (device_id, co2_ppm, co2_percent, previous_co2_ppm, delta_co2_ppm, co2_trend,
