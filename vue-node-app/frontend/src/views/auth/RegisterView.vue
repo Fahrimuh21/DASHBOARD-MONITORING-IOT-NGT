@@ -87,8 +87,8 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import logoUrl from '@/assets/logo-pkm-erfat.png'
-import maskotUrl from '@/assets/MaskotNaspion.png'
+import logoUrl from '@/assets/logo-pkm-erfat.webp'
+import maskotUrl from '@/assets/MaskotNaspion.webp'
 
 const router = useRouter()
 const authStore = useAuthStore()

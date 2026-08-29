@@ -138,7 +138,7 @@
           <h2 class="lp-h2">Apa Itu Naspiotech?</h2>
           <p class="lp-desc">
             Naspiotech adalah sistem pemantauan berbasis sensor CO₂ yang dirancang khusus
-            untuk mendukung keamanan penggunaan selang NGT. Bukan pengganti prosedur klinis —
+            untuk mendukung keamanan penggunaan selang NGT. Bukan pengganti prosedur klinis
             melainkan alat bantu agar kondisi yang perlu diperhatikan lebih cepat terdeteksi.
           </p>
         </div>
@@ -162,7 +162,7 @@
           <p class="lp-desc">
             NGT (Nasogastric Tube) adalah selang yang masuk lewat hidung menuju lambung,
             digunakan untuk pemberian nutrisi atau obat. Posisi selang yang melenceng ke
-            saluran napas bisa menimbulkan komplikasi serius — mulai dari batuk, sesak,
+            saluran napas bisa menimbulkan komplikasi serius mulai dari batuk, sesak,
             hingga pneumonia aspirasi.
           </p>
         </div>
@@ -224,7 +224,7 @@
             <h2 class="lp-h2">PKM-KC</h2>
             <p class="lp-desc">
               PKM Karsa Cipta mendorong mahasiswa menciptakan karya teknologi
-              yang punya nilai guna nyata. Naspiotech lahir dari sini — prototipe
+              yang punya nilai guna nyata. Naspiotech lahir dari sini yaitu prototipe
               monitoring NGT yang mencoba menjawab kebutuhan nyata di lingkungan klinis.
             </p>
             <router-link to="/login" class="lp-btn lp-btn--solid" style="margin-top:8px">
@@ -251,7 +251,7 @@
         <div class="lp-section__head lp-section__head--center" data-reveal>
           <h2 class="lp-h2">Meet the Team</h2>
           <p class="lp-desc">
-            Lima mahasiswa, satu tujuan — membangun alat monitoring NGT yang benar-benar bisa dipakai di lapangan.
+            Lima mahasiswa, satu tujuan membangun alat monitoring NGT yang benar-benar bisa dipakai di lapangan.
           </p>
         </div>
       </div>
@@ -287,9 +287,6 @@
             <span>Naspiotech</span>
           </div>
           <p>Realtime CO₂ monitoring untuk keamanan pemasangan NGT.</p>
-          <p class="lp-footer__note">
-            Sistem ini adalah alat bantu pemantauan. Bukan pengganti penilaian klinis.
-          </p>
         </div>
 
         <div class="lp-footer__col">
@@ -332,20 +329,20 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
-import logoUrl   from '@/assets/logo-pkm-erfat.png'
-import mascotUrl  from '@/assets/MaskotNaspion.png'
-import SimbelmawaUrl  from '@/assets/Simbelmawa.png'
-import PKMUrl  from '@/assets/PKM.png'
-import KemdiktiUrl  from '@/assets/Kemdikti.png'
-import BelmawaUrl  from '@/assets/Belmawa.png'
-import DiktiUrl  from '@/assets/Dikti.png'
-import UndipUrl from '@/assets/UNDIP.png'
-import salsaPhoto  from '@/assets/Salsa-Project Leader.png'
-import erfatPhoto  from '@/assets/Erfat-Clinical Research.png'
-import fatikaPhoto from '@/assets/Fatika-Clinical Validation.png'
-import fahriPhoto  from '@/assets/Fahri-Software Engineer.png'
-import vidiPhoto   from '@/assets/Vidi-Hardware Engineer.png'
-import adhePhoto   from '@/assets/Adhe Setya Pramayoga, S.kom., M.T-Pembina..png'
+import logoUrl   from '@/assets/logo-pkm-erfat.webp'
+import mascotUrl  from '@/assets/MaskotNaspion.webp'
+import SimbelmawaUrl  from '@/assets/Simbelmawa.webp'
+import PKMUrl  from '@/assets/PKM.webp'
+import KemdiktiUrl  from '@/assets/Kemdikti.webp'
+import BelmawaUrl  from '@/assets/Belmawa.webp'
+import DiktiUrl  from '@/assets/Dikti.webp'
+import UndipUrl from '@/assets/UNDIP.webp'
+import salsaPhoto  from '@/assets/Salsa-Project-Leader.webp'
+import erfatPhoto  from '@/assets/Erfat-Clinical Research.webp'
+import fatikaPhoto from '@/assets/Fatika-Clinical Validation.webp'
+import fahriPhoto  from '@/assets/Fahri-Software Engineer.webp'
+import vidiPhoto   from '@/assets/Vidi-Hardware-Engineer.webp'
+import adhePhoto   from '@/assets/Adhe Setya Pramayoga, S.kom., M.T-Pembina..webp'
 
 /* ── State ── */
 const scrolled   = ref(false)
