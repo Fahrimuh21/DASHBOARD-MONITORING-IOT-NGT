@@ -28,14 +28,14 @@
             <label>
               <input type="radio" v-model="form.role" value="PASIEN" />
               <div class="role-tab">
-                <span class="role-icon">🛏️</span>
+                <span class="role-icon"></span>
                 Pasien
               </div>
             </label>
             <label>
               <input type="radio" v-model="form.role" value="PERAWAT" />
               <div class="role-tab">
-                <span class="role-icon">⚕️</span>
+                <span class="role-icon"></span>
                 Perawat
               </div>
             </label>
